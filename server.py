@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 # coding: utf-8
+from datetime import datetime
+
 import utils as u
 from data import data as data_init
-from flask import Flask, render_template, request, url_for, redirect, flash, make_response
+from flask import Flask, render_template, request, url_for, redirect, flash, make_response, jsonify
 from markupsafe import escape
 
 
@@ -34,8 +36,20 @@ def showip(req, msg):
 
 @app.route('/')
 def index():
-    d.load()
     showip(request, '/')
+    web_data = get_data()
+    return render_template(
+        'index.html',
+        **web_data
+    )
+
+@app.route('/refresh')
+def refresh():
+    web_data = get_data()
+    return jsonify(web_data)
+    
+def get_data():
+    d.load()
     ot = d.data['other']
     try:
         stat = d.data['status_list'][d.data['status']]
@@ -48,17 +62,25 @@ def index():
             'desc': '未知的标识符，可能是配置问题。',
             'color': 'error'
         }
-    return render_template(
-        'index.html',
+    # 计时
+    try:
+        update_time = datetime.strptime(d.data.get('update_time', ''), u.TIME_FORMAT)
+        record_time = (datetime.now() - update_time).total_seconds()
+    except:
+        record_time = -1
+    return dict(
         user=ot['user'],
         learn_more=ot['learn_more'],
         repo=ot['repo'],
         status_name=stat['name'],
         status_desc=stat['desc'],
         status_color=stat['color'],
-        more_text=ot['more_text']
+        more_text=ot['more_text'],
+        record_time=record_time
     )
 
+if __name__ == '__main__':
+    app.run(debug=True)
 
 @app.route('/style.css')
 def style_css():
@@ -119,6 +141,7 @@ def set_normal():
     if secret == secret_real:
         d.dset('status', status)
         d.dset('app_name', app_name)
+        d.dset('update_time', datetime.now().strftime(u.TIME_FORMAT))
         u.info('set success')
         ret = {
             'success': True,

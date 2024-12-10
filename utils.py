@@ -25,3 +25,5 @@ def format_dict(dic):
     @param dic: 列表
     '''
     return json.dumps(dic, indent=4, ensure_ascii=False, sort_keys=False, separators=(', ', ': '))
+
+TIME_FORMAT = '%Y-%m-%d %H:%M:%S'

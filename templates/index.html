@@ -7,17 +7,22 @@
     <title>{{ user }} Alive?</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    
+    <!-- scripts -->
+    <script src="{{ url_for('static', filename='js/timedelta.js') }}"></script>
 </head>
 
 <!-- url_for('static', filename='') -->
 
 <body>
     <div class="card">
-        <a style="font-size: 2em;"><ruby>似<rt>sǐ</rt></ruby>了吗?</a>
+        <a style="font-size: 2em;">似了吗?</a>
 
         <div style="height: 20px;"></div>
 
         <a>{{ user }}'s Status:<br><a id="status" style="font-size: 1.2em;">{{ status_name }}</a></a>
+        <br>
+        <a id="record_time" style="font-size: 1em;">已经过了：加载中...</a>
         <br>
         <a id="additional-info" style="font-size: 1em;">{{ status_desc }}</a>
 
@@ -40,6 +45,30 @@
     <script>
         const statusElement = document.getElementById('status');
         statusElement.classList.add('{{ status_color }}');
+    </script> 
+    
+    <script>
+        let totalSeconds = {{ total_seconds }};
+        startTimer(totalSeconds);
+
+        function fetchUpdatedData() {
+            $.ajax({
+                url: '/refresh',
+                method: 'GET',
+                success: function(data) {
+                    totalSeconds = data.total_seconds;
+                    startTimer(totalSeconds);
+                    
+                    document.getElementById('status').innerText = '' + data.status_name;
+                    document.getElementById('additional-info').innerText = '' + data.status_desc;
+                    const statusElement = document.getElementById('status');
+                    statusElement.classList.add(data.status_color);
+                },
+                error: function(error) {
+                    console.log("Error fetching data:", error);
+                }
+            });
+        }
     </script>
 </body>
 
