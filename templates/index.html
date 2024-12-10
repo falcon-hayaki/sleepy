@@ -48,7 +48,7 @@
     </script> 
     
     <script>
-        {% comment %} let totalSeconds = {{ total_seconds }};
+        let totalSeconds = {{ total_seconds }};
         startTimer(totalSeconds);
 
         function fetchUpdatedData() {
@@ -67,7 +67,7 @@
                 error: function(error) {
                     console.log("Error fetching data:", error);
                 }
-            }); {% endcomment %}
+            });
         }
     </script>
 </body>
