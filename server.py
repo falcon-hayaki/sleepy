@@ -65,7 +65,7 @@ def get_data():
     # 计时
     try:
         update_time = datetime.strptime(d.data.get('update_time', ''), u.TIME_FORMAT)
-        record_time = (datetime.now() - update_time).total_seconds()
+        record_time = int((datetime.now() - update_time).total_seconds())
     except:
         record_time = -1
     return dict(
